@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "latin-asr"
+version = "0.1.0"
+description = "Fine-tuning Wav2Vec2 for Latin Automatic Speech Recognition"
+authors = [{ name = "N. Jand" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "transformers>=5.2.0",
+    "datasets[audio]>=2.12.0",
+    "evaluate>=0.4.0",
+    "jiwer>=3.0.0",
+    "modal>=0.60.0",
+    "huggingface-hub>=0.16.0",
+    "wandb>=0.15.0",
+    "codecarbon>=2.2.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "gradio>=6.17.3",
+    "librosa>=0.11.0",
+    "accelerate>=1.1.0",
+    "ruff>=0.16.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/njand/latin-asr"
+Repository = "https://github.com/njand/latin-asr"
+Issues = "https://github.com/njand/latin-asr/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0"
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+include = ["latin_asr*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
