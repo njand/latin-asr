@@ -1,4 +1,4 @@
-# `latin-asr`: Classical Latin Automatic Speech Recognition
+# `latin-asr`: Latin Automatic Speech Recognition
 
 [![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model%20Card-yellow)](https://huggingface.co/njand/wav2vec2-xls-r-latin)
 [![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Gradio-Live%20Demo-blue)](https://huggingface.co/spaces/njand/wav2vec2-xls-r-latin)
@@ -15,7 +15,7 @@ The system targets **Restored Classical Pronunciation** and features an automate
 ## 🚀 Model Artifacts & Deployment
 
 The fine-tuned model is published on Hugging Face in PyTorch and optimized ONNX formats:
-👉 **[njand/wav2vec2-xls-r-latin](https://huggingface.co/njand/wav2vec2-xls-r-latin)** | 🎮 **[Live Gradio Demo](https://huggingface.co/spaces/njand/wav2vec2-xls-r-latin)**
+👉 **[njand/wav2vec2-xls-r-latin](https://huggingface.co/njand/wav2vec2-xls-r-latin)** | 🎮 **[Live Gradio Demo](https://huggingface.co/spaces/njand/latin-asr-demo)**
 
 ### Model Formats & Memory Footprint
 
