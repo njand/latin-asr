@@ -1,7 +1,7 @@
 # `latin-asr`: Latin Automatic Speech Recognition
 
 [![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model%20Card-yellow)](https://huggingface.co/njand/wav2vec2-xls-r-latin)
-[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Gradio-Live%20Demo-blue)](https://huggingface.co/spaces/njand/wav2vec2-xls-r-latin)
+[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Gradio-Live%20Demo-blue)](https://huggingface.co/spaces/njand/latin-asr-demo)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
