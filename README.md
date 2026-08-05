@@ -35,7 +35,7 @@ The fine-tuned model is published on Hugging Face in PyTorch and optimized ONNX 
 from transformers import pipeline
 
 transcriber = pipeline("automatic-speech-recognition", model="njand/wav2vec2-xls-r-latin")
-result = transcriber("path/to/classical_latin.wav")
+result = transcriber("path/to/latin.wav")
 print(result["text"])
 
 ```
@@ -61,7 +61,7 @@ model = ORTModelForCTC.from_pretrained(
 processor = AutoProcessor.from_pretrained("njand/wav2vec2-xls-r-latin")
 
 # Run inference
-inputs = processor("path/to/classical_latin.wav", return_tensors="pt")
+inputs = processor("path/to/latin.wav", return_tensors="pt")
 logits = model(**inputs).logits
 
 ```
