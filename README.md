@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
-An end-to-end Machine Learning pipeline and Python framework for fine-tuning self-supervised speech representations ([`facebook/wav2vec2-xls-r-300m`](https://huggingface.co/facebook/wav2vec2-xls-r-300m)) on a corpus of spoken Latin ([`njand/llpsi-speech-dataset`](https://huggingface.co/datasets/njand/llpsi-speech-dataset)). 
+An end-to-end Machine Learning pipeline and Python framework for fine-tuning self-supervised speech representations ([`facebook/wav2vec2-xls-r-300m`](https://huggingface.co/facebook/wav2vec2-xls-r-300m)) on a corpus of spoken Latin ([`njand/llpsi-speech-dataset`](https://huggingface.co/datasets/njand/llpsi-speech-dataset)) (currently private).
 
 The system targets **Restored Classical Pronunciation** and features an automated serverless training pipeline built on **Modal**, **Hugging Face Hub**, **Weights & Biases**, and **CodeCarbon**.
 
