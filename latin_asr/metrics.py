@@ -24,7 +24,7 @@ def normalize_latin_text(text: str) -> str:
 
 
 def create_compute_metrics_fn(processor: Any) -> Callable[[Any], dict[str, float]]:
-    """Factory function returning the evaluation callback for Strict and Normalized WER/CER metrics."""
+    """Factory function returning an optimized evaluation callback for Strict and Normalized WER/CER metrics."""
     wer_metric = evaluate.load("wer")
     cer_metric = evaluate.load("cer")
 
@@ -32,32 +32,52 @@ def create_compute_metrics_fn(processor: Any) -> Callable[[Any], dict[str, float
         pred_logits = pred.predictions
         pred_ids = np.argmax(pred_logits, axis=-1)
 
-        # Replace ignored index padding (-100) with pad token ID for decoding
-        label_ids = np.where(
-            pred.label_ids == -100, processor.tokenizer.pad_token_id, pred.label_ids
+        # Decode model outputs (CTC grouping active)
+        pred_str: list[str] = processor.batch_decode(
+            pred_ids, 
+            skip_special_tokens=True
         )
 
-        # Decode exact model outputs and target labels (Strict)
-        pred_str: list[str] = processor.batch_decode(pred_ids)
-        label_str: list[str] = processor.batch_decode(label_ids, group_tokens=False)
+        # Vectorized / native list conversion for fast iteration
+        label_ids = (
+            pred.label_ids.tolist()
+            if isinstance(pred.label_ids, np.ndarray)
+            else pred.label_ids
+        )
+        pad_id = processor.tokenizer.pad_token_id
 
-        # Derive normalized strings (Strip macrons & map j/v -> i/u)
+        # Clean target labels: filter out loss-ignore mask (-100) and pad tokens
+        label_ids_cleaned = [
+            [token for token in label if token != -100 and (pad_id is None or token != pad_id)]
+            for label in label_ids
+        ]
+
+        # Decode target labels preserving double letters (group_tokens=False)
+        label_str: list[str] = processor.batch_decode(
+            label_ids_cleaned, 
+            group_tokens=False, 
+            skip_special_tokens=True
+        )
+
+        # 5. Derive normalized strings
         norm_pred_str = [normalize_latin_text(s) for s in pred_str]
         norm_label_str = [normalize_latin_text(s) for s in label_str]
 
-        # Compute Strict metrics
-        strict_wer = wer_metric.compute(predictions=pred_str, references=label_str)
-        strict_cer = cer_metric.compute(predictions=pred_str, references=label_str)
+        # 6. Safeguard: Prevent division-by-zero crashes on empty references
+        label_str_safe = [s if s.strip() else " " for s in label_str]
+        norm_label_str_safe = [s if s.strip() else " " for s in norm_label_str]
 
-        # Compute Normalized metrics
-        norm_wer = wer_metric.compute(predictions=norm_pred_str, references=norm_label_str)
-        norm_cer = cer_metric.compute(predictions=norm_pred_str, references=norm_label_str)
+        # 7. Compute Strict & Normalized metrics
+        strict_wer = wer_metric.compute(predictions=pred_str, references=label_str_safe)
+        strict_cer = cer_metric.compute(predictions=pred_str, references=label_str_safe)
+        norm_wer = wer_metric.compute(predictions=norm_pred_str, references=norm_label_str_safe)
+        norm_cer = cer_metric.compute(predictions=norm_pred_str, references=norm_label_str_safe)
 
         return {
-            "strict_wer": strict_wer,
-            "strict_cer": strict_cer,
-            "norm_wer": norm_wer,
-            "norm_cer": norm_cer
+            "strict_wer": float(strict_wer),
+            "strict_cer": float(strict_cer),
+            "norm_wer": float(norm_wer),
+            "norm_cer": float(norm_cer),
         }
 
     return compute_metrics
