@@ -125,7 +125,7 @@ def build_training_args(
 ) -> TrainingArguments:
     """Constructs TrainingArguments for Hugging Face Trainer."""
     eval_strategy = "epoch" if is_eval_enabled else "no"
-    save_strategy = "epoch" if is_eval_enabled else "no"
+    save_strategy = "epoch"
 
     return TrainingArguments(
         output_dir=output_dir,
@@ -174,6 +174,7 @@ def publish_model_and_readme(
     """Saves model artifacts, updates README.md, and uploads files to target HF Hub branch."""
     # Ensure latest model and processor state are saved to disk
     trainer.save_model(output_dir)
+    trainer.save_state(output_dir)
     trainer.processing_class.save_pretrained(output_dir)
 
     # Write the pre-generated README (YAML frontmatter + body)
