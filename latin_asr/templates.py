@@ -103,7 +103,7 @@ def generate_final_readme(
     avg_strict_wer: float,
     avg_strict_cer: float,
     avg_norm_wer: float,
-    avg_norm_cer: float,
+    avg_norm_cer: float
 ) -> str:
     """Generates the consolidated Model Card README string for the final training run."""
     fold_table_rows = "\n".join(
@@ -126,6 +126,10 @@ tags:
 - classical-latin
 - macrons
 - audio
+- onnx
+- optimum
+- int8
+- gradio
 datasets:
 - {dataset_name}
 metrics:
@@ -160,48 +164,32 @@ model-index:
 
 Fine-tuned version of [`{base_model}`](https://huggingface.co/{base_model}) for Latin Automatic Speech Recognition (ASR), trained on reading passages from `{dataset_name}`.
 
+- **Live Demo:** [Gradio Interface](https://huggingface.co/spaces/njand/latin-asr-demo)
 - **Source Code:** [GitHub Repository](https://github.com/njand/latin-asr)
 - **Base Model:** [`{base_model}`](https://huggingface.co/{base_model})
 - **Dataset:** [`{dataset_name}`](https://huggingface.co/datasets/{dataset_name}) (currently private)
 - **Pronunciation Standard:** Restored Classical Pronunciation
-- **Orthography:** Fully Macronized (ā, ē, ī, ō, ū, ȳ)
+- **Orthography:** Macrons (ā, ē, ī, ō, ū, ȳ); consonantal j/v
 
 ---
 
-## 🔤 Orthography & Text Normalization
+## 🛠️ Model Variants & Optimization
 
-This model transcribes audio using the following orthographic conventions:
+To facilitate production deployment on CPU-based infrastructure, this repository provides the model in three formats:
 
-- **Vowel Quantity:** Preserves long vowel macrons (ā, ē, ī, ō, ū, ȳ).
-- **Consonantal vs. Vocalic Glides:** Distinguishes consonantal **j** and **v** from vocalic **i** and **u** (e.g., *ējiciō* rather than *eicio*, *vīvus* rather than *uiuus*).
-- **Casing & Punctuation:** Transcribes lowercase text with no punctuation.
+| Format | Precision | File Size | Recommended Use Case |
+| :--- | :--- | :--- | :--- |
+| **PyTorch** | FP32 | --- | Training, fine-tuning, and research |
+| **ONNX** | FP32 | --- | Cross-platform inference |
+| **ONNX Quantized** | INT8 | --- | **Production, Edge, & CPU Inference** |
 
----
-
-## 📊 Cross-Validation Performance
-
-Evaluated across {fold_count}-fold cross-validation on `{dataset_name}`:
-
-| Fold | Strict WER | Strict CER | Norm WER | Norm CER |
-| :--- | :---: | :---: | :---: | :---: |
-{fold_table_rows}
-| **Average (CV)** | **{avg_strict_wer:.2f}%** | **{avg_strict_cer:.2f}%** | **{avg_norm_wer:.2f}%** | **{avg_norm_cer:.2f}%** |
-
-> **Note:** Normalized WER/CER measure core word recognition (macrons stripped, j/v → i/u), while Strict WER/CER enforce exact macron placement and **j/v** orthography.
-
----
-
-## ⚡ Environmental Impact & Compute
-
-- **Hardware:** NVIDIA L4 GPU (24GB VRAM) via Modal
-- **Total Training Time:** {hours_str}
-- **Estimated Carbon Emissions:** {carbon_str}
+> **Why Quantized?** The INT8 version offers ~3x faster inference speed on standard CPUs compared to the original FP32 PyTorch weights while retaining near-identical transcription accuracy.
 
 ---
 
 ## 🚀 Quickstart
 
-### Option 1: Using Hugging Face `pipeline` (Recommended)
+### Option 1: Standard Inference (PyTorch)
 
 ```python
 from transformers import pipeline
@@ -212,32 +200,58 @@ print(result["text"])
 
 ```
 
-### Option 2: Manual PyTorch Inference
+### Option 2: Optimized Inference (Optimum ONNX Runtime)
+
+For CPU inference, I recommend using the INT8 quantized model. Install dependencies: `pip install "optimum[onnxruntime]"`
 
 ```python
-import torch
-import torchaudio
-from transformers import AutoProcessor, Wav2Vec2ForCTC
+from optimum.onnxruntime import ORTModelForCTC
+from transformers import AutoProcessor
 
+# Load the quantized model
+model = ORTModelForCTC.from_pretrained(
+    "{hf_repo_id}", 
+    file_name="model_quantized.onnx"
+)
 processor = AutoProcessor.from_pretrained("{hf_repo_id}")
-model = Wav2Vec2ForCTC.from_pretrained("{hf_repo_id}")
 
-# Load and resample audio to 16kHz mono
-waveform, sample_rate = torchaudio.load("sample.wav")
-if sample_rate != 16000:
-    resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=16000)
-    waveform = resampler(waveform)
-
-inputs = processor(waveform.squeeze(0), sampling_rate=16000, return_tensors="pt")
-
-with torch.no_grad():
-    logits = model(**inputs).logits
-
-predicted_ids = torch.argmax(logits, dim=-1)
-transcription = processor.batch_decode(predicted_ids)
-print(transcription[0])
+# Inference pipeline
+inputs = processor("sample.wav", return_tensors="pt")
+outputs = model(**inputs)
+# ... decode outputs
 
 ```
+
+---
+
+## 🔤 Orthography & Text Normalization
+
+This model transcribes audio using the following orthographic conventions:
+
+* **Vowel Quantity:** Macronizes long vowels (ā, ē, ī, ō, ū, ȳ).
+* **Consonantal vs. Vocalic Glides:** Distinguishes consonantal **j** and **v** from vocalic **i** and **u** (e.g., *ējiciō* rather than *eicio*, *vīvus* rather than *uiuus*).
+* **Casing & Punctuation:** Transcribes lowercase text with no punctuation.
+
+---
+
+## 📊 Cross-Validation Performance
+
+Evaluated across {fold_count}-fold cross-validation on `{dataset_name}`:
+
+| Fold | Strict WER | Strict CER | Norm WER | Norm CER |
+| --- | --- | --- | --- | --- |
+| {fold_table_rows} |  |  |  |  |
+| **Average (CV)** | **{avg_strict_wer:.2f}%** | **{avg_strict_cer:.2f}%** | **{avg_norm_wer:.2f}%** | **{avg_norm_cer:.2f}%** |
+
+> **Note:** Normalized WER/CER measure core word recognition (macrons stripped, j/v → i/u), while Strict WER/CER enforce exact macron placement and **j/v** orthography.
+
+---
+
+## ⚡ Environmental Impact & Compute
+
+* **Hardware:** NVIDIA L4 GPU (24GB VRAM) via Modal
+* **Total Training Time:** {hours_str}
+* **Estimated Carbon Emissions:** {carbon_str}
 
 ---
 

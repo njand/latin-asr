@@ -135,7 +135,7 @@ def build_training_args(
         eval_strategy=eval_strategy,
         save_strategy=save_strategy,
         num_train_epochs=num_epochs,
-        logging_steps=50,
+        logging_steps=config.logging_steps,
         disable_tqdm=True,
         dataloader_num_workers=4,
         bf16=config.bf16,

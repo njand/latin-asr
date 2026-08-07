@@ -7,17 +7,18 @@ class TrainingConfig:
     hf_repo_id: str = "njand/wav2vec2-xls-r-latin"
     dataset_name: str = "njand/llpsi-speech-dataset"
     base_model: str = "facebook/wav2vec2-xls-r-300m"
-    exp_prefix: str = "v4.0"
+    exp_prefix: str = "v5.0"
     
     # --- Pipeline & Optimization ---
     num_folds: int = 5
-    target_fold_epochs: int = 16
+    target_fold_epochs: int = 24
     per_device_train_batch_size: int = 8
-    per_device_eval_batch_size: int = 8
+    per_device_eval_batch_size: int = 1
     gradient_accumulation_steps: int = 2
     learning_rate: float = 8e-5
     weight_decay: float = 0.01
-    warmup_steps: int = 500
+    warmup_steps: int = 800
+    logging_steps: int = 50
     bf16: bool = True
     fp16: bool = False
 
@@ -25,7 +26,7 @@ class TrainingConfig:
     attention_dropout: float = 0.15
     hidden_dropout: float = 0.15
     feat_proj_dropout: float = 0.10
-    final_dropout: float = 0.20
+    final_dropout: float = 0.15
     layerdrop: float = 0.10
 
     # --- SpecAugment ---
