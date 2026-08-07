@@ -72,14 +72,14 @@ logits = model(**inputs).logits
 
 Evaluated across a 5-fold cross-validation scheme on `njand/llpsi-speech-dataset`. Metrics track both **Strict** text recognition (preserving macron diacritics and *j/v* glides) and **Normalized** text recognition (macrons stripped, *j* to *i*, *v* to *u*).
 
-| Fold Metric | Strict WER | Strict CER | Norm WER | Norm CER |
+| Fold | Strict WER | Strict CER | Norm WER | Norm CER |
 | --- | --- | --- | --- | --- |
-| **Fold 0** | 27.09% | 13.06% | 25.26% | 12.48% |
-| **Fold 1** | 26.33% | 12.92% | 24.61% | 12.33% |
-| **Fold 2** | 26.27% | 12.74% | 24.59% | 12.18% |
-| **Fold 3** | 27.21% | 12.91% | 25.26% | 12.27% |
-| **Fold 4** | 28.16% | 13.12% | 26.59% | 12.58% |
-| **Average (5-Fold CV)** | **27.01%** | **12.95%** | **25.26%** | **12.37%** |
+| **Fold 0** | 13.37% | 2.73% | 11.71% | 2.26% |
+| **Fold 1** | 13.10% | 2.77% | 11.40% | 2.28% |
+| **Fold 2** | 12.44% | 2.58% | 10.75% | 2.10% |
+| **Fold 3** | 13.06% | 2.74% | 11.43% | 2.27% |
+| **Fold 4** | 14.04% | 2.91% | 12.44% | 2.41% |
+| **Average (5-Fold CV)** | **12.20%** | **2.74%** | **11.54%** | **2.27%** |
 
 ---
 
